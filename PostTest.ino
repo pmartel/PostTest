@@ -21,7 +21,6 @@ Content-Type: text/html\r\n\r\n\
 <!DOCTYPE HTML>\r\n<html><head><title>\r\n\
 Thing Dev Board Web Page</title>\r\n\
 </head><body>\r\n\
-<form action=\"/action_page_post.php\" method=\"post\" target=\"_blank\">\r\n\
   First name: <input type=\"text\" name=\"fname\"><br>\r\n\
   Last name: <input type=\"text\" name=\"lname\"><br>\r\n\
   <input type=\"submit\" value=\"Submit\">\r\n\
@@ -47,21 +46,25 @@ void loop() {
   }
 
   // Read the first line of the request
+  String req;
+  int n, i=1;  
   Serial.println("Thing got request:");
-  String req = client.readString();
-//String req = client.readStringUntil('\r');
+  // read and print entire request
 
-  Serial.print("");
-  Serial.print(req);
-  Serial.println(">>>");
+  req = client.readString(); 
+
+  Serial.println(req);
+
+  Serial.println("");
   // Prepare the response. Start with the common header:
   //String s = "HTTP/1.1 200 OK\r\n";
   String s = "";
   s += Page;
- Serial.println("\r\nSending <<<");
+#ifdef DEBUG  
+  Serial.println("\r\nSending <<<");
   Serial.println(s);
   Serial.println(">>> to web client\r\n");
-
+#endif
   // Send the response to the client
   client.print(s);
   delay(1);
