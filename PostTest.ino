@@ -21,6 +21,7 @@ Content-Type: text/html\r\n\r\n\
 <!DOCTYPE HTML>\r\n<html><head><title>\r\n\
 Thing Dev Board Web Page</title>\r\n\
 </head><body>\r\n\
+<form method=\"post\" \">\r\n\
   First name: <input type=\"text\" name=\"fname\"><br>\r\n\
   Last name: <input type=\"text\" name=\"lname\"><br>\r\n\
   <input type=\"submit\" value=\"Submit\">\r\n\
@@ -45,14 +46,24 @@ void loop() {
     return;
   }
 
-  // Read the first line of the request
-  String req;
-  int n, i=1;  
+
+  String req, currLine, rest;
+  int n, i=1, idx;  
   Serial.println("Thing got request:");
-  // read and print entire request
+  // read (and print) entire request
+  // we seem to have trouble handling the 0-length string in
+  // a POST request reading a line at a time.
 
   req = client.readString(); 
-
+  // punt an empty request
+  if ( req.length() == 0 ) return;
+  // punt an icon request ffor now
+  if (req.indexOf( "GET /favicon.ico") >=0) return;
+  
+  idx = req.indexOf("\r\n");
+  currLine = req.substring(0,idx);
+  Serial.print("currLine: ");
+  Serial.println(currLine);
   Serial.println(req);
 
   Serial.println("");
