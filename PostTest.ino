@@ -54,15 +54,14 @@ void loop() {
   req = client.readString(); 
   // punt an empty request
   if ( req.length() == 0 ) return;
-  // punt an icon request ffor now
+  // punt an icon request for now
   if (req.indexOf( "GET /favicon.ico") >=0) return;
 
   Serial.print("Thing got request:<<");
   Serial.print(req);
   Serial.println(">>Processing request:");
-  while( 1 ) {
+  while( req.length() > 0  ) {
     currLine = getLine( &req, "\r\n");
-    if ( req == "\0") break;
     Serial.print( i++ );
     Serial.print( " | " );
     Serial.print( currLine.length());
@@ -71,15 +70,6 @@ void loop() {
     Serial.println( ">>" );
   }
   
-/*
-  idx = req.indexOf("\r\n");
-  currLine = req.substring(0,idx);
-  
-  Serial.print("currLine: ");
-  Serial.println(currLine);
-  Serial.println(req);
-*/
-
   Serial.println("");
   // Prepare the response. Start with the common header:
   //String s = "HTTP/1.1 200 OK\r\n";
@@ -113,30 +103,14 @@ String getLine( String *s, const String sep ){
       retLine = String('\0');
       *s = retLine;
     }
-    Serial.print("retLine=<<");
-    Serial.print(retLine);
-    Serial.println(">>");
-    Serial.println("Nothing left");
     return retLine;
   }
   
   retLine = s->substring(0,i);
   i += sep.length();
-  Serial.print( "s =<<" );
-  Serial.print( *s );
-  Serial.println(">>");
-  Serial.print( "i=");
-  Serial.println( i);
-  
   *s = s->substring(i);
 
-  Serial.print("retLine=<<");
-  Serial.print(retLine);
-  Serial.println(">>");
-  Serial.print("s left=<<");
-  Serial.print( *s );
-  Serial.println(">>");
-  return retLine;
+   return retLine;
 }
 
 // WiFi functions
