@@ -11,7 +11,7 @@ const char WiFiPSK[] = "mpahrilleinpe";
 /////////////////////
 // Pin Definitions //
 /////////////////////
-const int LED_PIN = 5; // Thing's onboard, green LED
+const int LED_PIN = 5; // Thing's onboard, blue LED
 const int ANALOG_PIN = A0; // The only analog pin on the Thing
 const int DIGITAL_PIN = 12; // Digital pin to be read
 
@@ -22,14 +22,9 @@ Content-Type: text/html\r\n\r\n\
 Thing Dev Board Web Page</title>\r\n\
 </head><body>\r\n\
 <form method=\"post\" \">\r\n\
-  <input type=\"submit\" value=\"Blue Led on\" name=\"Led\"<br>\r\n\
-  <input type=\"submit\"  value=\"Blue Led off\" name=\"Led\"<br>\r\n\
+  Blue Led <input type=\"submit\" value=\"on\" name=\"Led\"<br>\r\n\
+  Blue Led <input type=\"submit\"  value=\"off\" name=\"Led\"<br>\r\n\
 </form><br />\r\n\
-<form method=\"post\" \">\r\n\
-  First name: <input type=\"text\" name=\"fname\"><br>\r\n\
-  Last name: <input type=\"text\" name=\"lname\"><br>\r\n\
-  <input type=\"submit\" value=\"Submit\">\r\n\
-</form>\r\n\
 </body></html>\r\n\
 ");
 
@@ -50,10 +45,8 @@ void loop() {
     return;
   }
 
-
   String req, currLine, rest;
   int n, i=1, idx;  
-  Serial.println("Thing got request:");
   // read (and print) entire request
   // we seem to have trouble handling the 0-length string in
   // a POST request reading a line at a time.
@@ -63,12 +56,29 @@ void loop() {
   if ( req.length() == 0 ) return;
   // punt an icon request ffor now
   if (req.indexOf( "GET /favicon.ico") >=0) return;
+
+  Serial.print("Thing got request:<<");
+  Serial.print(req);
+  Serial.println(">>Processing request:");
+  while( 1 ) {
+    currLine = getLine( &req, "\r\n");
+    if ( req == "\0") break;
+    Serial.print( i++ );
+    Serial.print( " | " );
+    Serial.print( currLine.length());
+    Serial.print( " <<" );
+    Serial.print( currLine);
+    Serial.println( ">>" );
+  }
   
+/*
   idx = req.indexOf("\r\n");
   currLine = req.substring(0,idx);
+  
   Serial.print("currLine: ");
   Serial.println(currLine);
   Serial.println(req);
+*/
 
   Serial.println("");
   // Prepare the response. Start with the common header:
@@ -86,6 +96,50 @@ void loop() {
   Serial.println("Client disonnected");
 }
 
+// Takes a String, s, containing multiple lines separated by sep
+// returns the first line and removes the line and sep from s
+String getLine( String *s, const String sep ){
+  String retLine;
+  int i;
+  
+  i = s->indexOf( sep );
+  if ( i == -1 ){
+    // last line may not have sep
+    if ( s->length() > 0 ) {
+      retLine = *s;
+      *s = String( '\0');
+    }
+    else {
+      retLine = String('\0');
+      *s = retLine;
+    }
+    Serial.print("retLine=<<");
+    Serial.print(retLine);
+    Serial.println(">>");
+    Serial.println("Nothing left");
+    return retLine;
+  }
+  
+  retLine = s->substring(0,i);
+  i += sep.length();
+  Serial.print( "s =<<" );
+  Serial.print( *s );
+  Serial.println(">>");
+  Serial.print( "i=");
+  Serial.println( i);
+  
+  *s = s->substring(i);
+
+  Serial.print("retLine=<<");
+  Serial.print(retLine);
+  Serial.println(">>");
+  Serial.print("s left=<<");
+  Serial.print( *s );
+  Serial.println(">>");
+  return retLine;
+}
+
+// WiFi functions
 void connectWiFi()
 {
   byte ledStatus = LOW;
