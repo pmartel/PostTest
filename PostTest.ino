@@ -21,6 +21,7 @@ Content-Type: text/html\r\n\r\n\
 <!DOCTYPE HTML>\r\n<html><head><title>\r\n\
 Thing Dev Board Web Page</title>\r\n\
 </head><body>\r\n\
+<form>\r\n\
   First name: <input type=\"text\" name=\"fname\"><br>\r\n\
   Last name: <input type=\"text\" name=\"lname\"><br>\r\n\
   <input type=\"submit\" value=\"Submit\">\r\n\
@@ -58,7 +59,7 @@ void loop() {
     Serial.print( " <<");
     Serial.print(req);
     Serial.println( ">>");
-
+    if ( req.length() == 0) break;
   }
 
 
