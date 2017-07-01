@@ -50,9 +50,7 @@ void loop() {
   int n, i=1;  
   Serial.println("Thing got request:");
   // read and print entire request
-  Serial.print( client.available() );
-  Serial.println( " bytes available");
-  while ( client.available() > 0 ){
+  while ( 1 ){
     req = client.readStringUntil('\r');
     Serial.print( i++ );
     Serial.print( " | ");
