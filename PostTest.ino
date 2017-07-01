@@ -21,7 +21,7 @@ Content-Type: text/html\r\n\r\n\
 <!DOCTYPE HTML>\r\n<html><head><title>\r\n\
 Thing Dev Board Web Page</title>\r\n\
 </head><body>\r\n\
-<form>\r\n\
+<form method=\"post\" \">\r\n\
   First name: <input type=\"text\" name=\"fname\"><br>\r\n\
   Last name: <input type=\"text\" name=\"lname\"><br>\r\n\
   <input type=\"submit\" value=\"Submit\">\r\n\
@@ -52,7 +52,7 @@ void loop() {
   Serial.println("Thing got request:");
   // read and print entire request
   while ( 1 ){
-    req = client.readStringUntil('\r');
+    req = client.readStringUntil('\n');
     Serial.print( i++ );
     Serial.print( " | ");
     Serial.print( req.length());
