@@ -11,7 +11,7 @@ const char WiFiPSK[] = "mpahrilleinpe";
 /////////////////////
 // Pin Definitions //
 /////////////////////
-const int LED_PIN = 5; // Thing's onboard, green LED
+const int LED_PIN = 5; // Thing's onboard, blue LED
 const int ANALOG_PIN = A0; // The only analog pin on the Thing
 const int DIGITAL_PIN = 12; // Digital pin to be read
 
@@ -50,10 +50,19 @@ void loop() {
   int n, i=1;  
   Serial.println("Thing got request:");
   // read and print entire request
+  Serial.print( client.available() );
+  Serial.println( " bytes available");
+  while ( client.available() > 0 ){
+    req = client.readStringUntil('\r');
+    Serial.print( i++ );
+    Serial.print( " | ");
+    Serial.print( req.length());
+    Serial.print( " <<");
+    Serial.print(req);
+    Serial.println( ">>");
 
-  req = client.readString(); 
+  }
 
-  Serial.println(req);
 
   Serial.println("");
   // Prepare the response. Start with the common header:
