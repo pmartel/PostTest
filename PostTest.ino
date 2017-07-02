@@ -48,35 +48,49 @@ void loop() {
 
   // Read the first line of the request
   String req;
-  int n, i=1;  
-  Serial.println("Thing got request:");
-  // read and print entire request
-  while ( 1 ){
-    req = client.readStringUntil('\n');
-    Serial.print( i++ );
-    Serial.print( " | ");
-    Serial.print( req.length());
-    Serial.print( " <<");
-    Serial.print(req);
-    Serial.println( ">>");
-    if ( req.length() == 0) break;
+  int n, i=1; 
+
+  // first line of request decides what happens
+  req = client.readStringUntil('\n');
+  if ( req.startsWith( "GET / HTTP/1.1") ){
+    // load web page
+    Serial.println( "Loading web page" );
+    client.print(Page);
+    delay(1);
+    req = client.readString(); // drop the rest 
+    return;
+  } else if (req.startsWith( "GET /favicon.ico HTTP/1.1" ) ) {
+    // At some point we may want to send an icon.  Punt for now
+    Serial.println( "favicon.ico request" );
+    delay(1);
+    req = client.readString(); // drop the rest
+    return;
+  } else if (req.startsWith( "GET /currentsetting.htm HTTP/1.1" ) ) {
+    // Seems to be part of the "keep alive". Punt for now
+    Serial.println( "currentsetting.htm request" );
+    delay(1);
+    req = client.readString(); // drop the rest
+    return;
+  } else if ( 0 == req.length() ) { // skip empty requests
+    delay(1);
+    Serial.println( "empty request" );
+    return;
+  } else if (req.startsWith( "POST / HTTP/1.1" ) ) {
+    // process the post
+    // skip until the data
+    while ( req.length() > 1 ) {
+      req = client.readStringUntil('\n');
+    }
+    if ( 1 == req.length() ) {
+      req = client.readStringUntil('\n');
+      Serial.println( "POSTed data:");
+      Serial.println( req );
+      client.print("HTTP/1.1 205 Reset content\r\n");
+    }
+    
+    delay(1);
   }
 
-
-  Serial.println("");
-  // Prepare the response. Start with the common header:
-  //String s = "HTTP/1.1 200 OK\r\n";
-  String s = "";
-  s += Page;
-#ifdef DEBUG  
-  Serial.println("\r\nSending <<<");
-  Serial.println(s);
-  Serial.println(">>> to web client\r\n");
-#endif
-  // Send the response to the client
-  client.print(s);
-  delay(1);
-  Serial.println("Client disonnected");
 }
 
 void connectWiFi()
