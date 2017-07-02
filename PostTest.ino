@@ -22,9 +22,10 @@ Content-Type: text/html\r\n\r\n\
 Thing Dev Board Web Page</title>\r\n\
 </head><body>\r\n\
 <form method=\"post\" \">\r\n\
-  First name: <input type=\"text\" name=\"fname\"><br>\r\n\
-  Last name: <input type=\"text\" name=\"lname\"><br>\r\n\
-  <input type=\"submit\" value=\"Submit\">\r\n\
+  Blue LED <input type=\"submit\" name=\"led\" value=\"ON\"><br>\r\n\
+  Blue LED <input type=\"submit\" name=\"led\" value=\"OFF\"><br>\r\n\
+  Blue LED <input type=\"submit\" name=\"blink\" value=\"BLINK\">\
+  <input type=\"float\" name=\"rate\" value=\"1\" size=\"5\"><br>\n\
 </form>\r\n\
 </body></html>\r\n\
 ");
@@ -84,8 +85,14 @@ void loop() {
     if ( 1 == req.length() ) {
       req = client.readStringUntil('\n');
       Serial.println( "POSTed data:");
-      Serial.println( req );
-      client.print("HTTP/1.1 205 Reset content\r\n");
+      Serial.println( req );\
+      // need to send back some response to avoid error
+      client.print("HTTP/1.1 204 No content\r\n");
+      if ( req.startsWith("led=ON") ){
+        digitalWrite(LED_PIN, 0);        
+      } else  if ( req.startsWith("led=OFF") ) {
+        digitalWrite(LED_PIN, 1);        
+      }
     }
     
     delay(1);
