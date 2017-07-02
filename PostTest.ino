@@ -2,6 +2,8 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
 
+#include <Ticker.h>
+
 //////////////////////
 // WiFi Definitions //
 //////////////////////
@@ -15,6 +17,8 @@ const int LED_PIN = 5; // Thing's onboard, blue LED
 const int ANALOG_PIN = A0; // The only analog pin on the Thing
 const int DIGITAL_PIN = 12; // Digital pin to be read
 
+Ticker tick;
+
 const char Page[] = ("\
 HTTP/1.1 200 OK\r\n\
 Content-Type: text/html\r\n\r\n\
@@ -25,7 +29,7 @@ Thing Dev Board Web Page</title>\r\n\
   Blue LED <input type=\"submit\" name=\"led\" value=\"ON\"><br>\r\n\
   Blue LED <input type=\"submit\" name=\"led\" value=\"OFF\"><br>\r\n\
   Blue LED <input type=\"submit\" name=\"blink\" value=\"BLINK\">\
-  <input type=\"float\" name=\"rate\" value=\"1\" size=\"5\"><br>\n\
+  <input type=\"text\" name=\"rate\" value=\"1\" size=\"5\"> blinks/sec<br>\n\
 </form>\r\n\
 </body></html>\r\n\
 ");
@@ -92,12 +96,25 @@ void loop() {
         digitalWrite(LED_PIN, 0);        
       } else  if ( req.startsWith("led=OFF") ) {
         digitalWrite(LED_PIN, 1);        
-      }
+      } else  if ( req.startsWith("blink") ) {
+        float rate;
+        int index;
+        String rString = "rate=";
+        
+        index = req.indexOf(rString)+ rString.length();
+        req = req.substring( index );
+        rate = req.toFloat();
+        Serial.print( "Blink rate = " );
+        Serial.println( rate );
+        if (rate > 0 ) {
+          startBlinker( rate );
+        } else {
+          stopBlinker();
+        }
+      } 
     }
-    
+  }  
     delay(1);
-  }
-
 }
 
 void connectWiFi()
@@ -156,6 +173,18 @@ void setupMDNS()
     }
   }
   Serial.println("mDNS responder started");
+}
 
+void startBlinker(float rate){
+  tick.attach(1./(2.*rate),toggleLED);
+}
+
+void stopBlinker(){
+   tick.detach();
+}
+
+void toggleLED(){
+  int led = digitalRead(LED_PIN);
+  digitalWrite(LED_PIN, 1-led);
 }
 
